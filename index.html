@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ProcurePilot — a working AI procurement decision agent built on PAL.">
+  <title>ProcurePilot — AI Procurement Agent on PAL</title>
+  <style>
+    :root {
+      --navy: #10283d;
+      --green: #0c8063;
+      --green-dark: #09654f;
+      --green-soft: #e9f6f1;
+      --amber: #b96e12;
+      --amber-soft: #fff5e7;
+      --ink: #18232d;
+      --muted: #61707c;
+      --line: #dce4df;
+      --paper: #f5f7f4;
+      --white: #fff;
+      --shadow: 0 14px 40px rgba(16, 40, 61, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 90% 2%, rgba(12, 128, 99, 0.13), transparent 26rem),
+        var(--paper);
+      font: 15px/1.48 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    }
+
+    a { color: inherit; }
+
+    .page {
+      width: min(1120px, calc(100% - 30px));
+      margin: 24px auto;
+      overflow: hidden;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      position: relative;
+      padding: 42px 46px 36px;
+      color: white;
+      background: var(--navy);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      top: -135px;
+      right: -80px;
+      border-radius: 50%;
+      background: rgba(65, 211, 166, 0.13);
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(290px, 0.65fr);
+      align-items: end;
+      gap: 34px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      color: #aee6d4;
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4ad3a8;
+      box-shadow: 0 0 0 5px rgba(74, 211, 168, 0.12);
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+      color: var(--navy);
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+    }
+
+    h1 {
+      max-width: 690px;
+      margin-bottom: 12px;
+      color: white;
+      font-size: clamp(38px, 5vw, 59px);
+    }
+
+    h2 {
+      margin-bottom: 12px;
+      font-size: 23px;
+    }
+
+    h3 {
+      margin-bottom: 6px;
+      font-size: 16px;
+    }
+
+    .hero p {
+      max-width: 720px;
+      margin: 0;
+      color: #c5d2dc;
+      font-size: 17px;
+    }
+
+    .hero-side {
+      display: grid;
+      gap: 10px;
+    }
+
+    .button {
+      padding: 13px 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      background: var(--green);
+      border: 0;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .button:hover { background: var(--green-dark); }
+
+    .button.secondary {
+      color: #d6e0e7;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+    }
+
+    .content {
+      padding: 32px 46px 38px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .metric {
+      padding: 17px;
+      background: #f8faf8;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+    }
+
+    .metric strong {
+      display: block;
+      color: var(--navy);
+      font-size: 25px;
+      letter-spacing: -0.035em;
+      line-height: 1;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.3;
+    }
+
+    .section {
+      padding: 26px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section:first-of-type {
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .section-label {
+      margin-bottom: 7px;
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 25px;
+    }
+
+    .copy p {
+      margin: 0;
+      color: #4f5e69;
+    }
+
+    .design {
+      padding: 20px;
+      background: var(--green-soft);
+      border: 1px solid #cce8de;
+      border-radius: 15px;
+    }
+
+    .design ul {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 18px;
+      margin: 12px 0 0;
+      padding: 0;
+      list-style: none;
+      font-size: 12px;
+    }
+
+    .design li {
+      position: relative;
+      padding-left: 18px;
+    }
+
+    .design li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 7px;
+      margin-top: 22px;
+    }
+
+    .flow-item {
+      position: relative;
+      min-height: 75px;
+      padding: 11px 9px;
+      background: #f8faf8;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--navy);
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .flow-item span {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--green);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+    }
+
+    .case {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .case-summary {
+      padding: 20px;
+      color: white;
+      background: var(--navy);
+      border-radius: 15px;
+    }
+
+    .case-summary h2 { color: white; }
+
+    .case-summary p {
+      margin: 0 0 14px;
+      color: #bfccd5;
+      font-size: 13px;
+    }
+
+    .winner {
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .winner strong {
+      display: block;
+      color: #74e1bf;
+      font-size: 25px;
+    }
+
+    .winner span {
+      color: #d7e2e9;
+      font-size: 12px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--navy);
+      background: #f7f9f7;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+    .recommended { color: var(--green); font-weight: 900; }
+    .late { color: var(--amber); font-weight: 800; }
+
+    .before-after {
+      display: grid;
+      grid-template-columns: 1fr 42px 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .workflow-box {
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+    }
+
+    .workflow-box.after {
+      background: var(--green-soft);
+      border-color: #cce8de;
+    }
+
+    .workflow-box ul {
+      margin: 9px 0 0;
+      padding-left: 18px;
+      color: #50606b;
+      font-size: 12px;
+    }
+
+    .workflow-box li { margin: 4px 0; }
+
+    .arrow {
+      display: grid;
+      place-items: center;
+      color: var(--green);
+      font-size: 25px;
+    }
+
+    .impact {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .impact p {
+      margin: 0;
+      color: #4f5e69;
+    }
+
+    .formula {
+      padding: 16px;
+      color: #d8eee7;
+      background: var(--navy);
+      border-radius: 13px;
+      font: 11px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    .evidence {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 20px;
+      background: var(--amber-soft);
+      border: 1px solid #ecd3ad;
+      border-radius: 14px;
+    }
+
+    .evidence p {
+      margin: 4px 0 0;
+      color: #6d512c;
+      font-size: 12px;
+    }
+
+    .evidence .button {
+      flex: 0 0 auto;
+      background: var(--amber);
+    }
+
+    .disclosure {
+      margin-top: 13px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.45;
+    }
+
+    .source-evidence {
+      margin-top: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f8faf8;
+    }
+
+    .source-evidence summary {
+      padding: 12px 15px;
+      color: var(--navy);
+      font-size: 11px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .source-links {
+      padding: 0 15px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .source-link {
+      padding: 6px 9px;
+      color: var(--green-dark);
+      background: var(--green-soft);
+      border: 1px solid #cce8de;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .source-link:hover {
+      color: white;
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .footer {
+      padding: 15px 46px;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      color: #84909a;
+      background: #f7f9f7;
+      border-top: 1px solid var(--line);
+      font-size: 10px;
+    }
+
+    code {
+      padding: 1px 4px;
+      color: var(--navy);
+      background: rgba(16, 40, 61, 0.07);
+      border-radius: 4px;
+      font: 0.92em ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    @media (max-width: 780px) {
+      .page { margin: 0; width: 100%; border: 0; border-radius: 0; }
+      .hero, .content { padding-left: 22px; padding-right: 22px; }
+      .hero-grid, .grid-2, .case, .impact { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+      .flow { grid-template-columns: repeat(2, 1fr); }
+      .before-after { grid-template-columns: 1fr; }
+      .arrow { transform: rotate(90deg); }
+      .evidence { align-items: flex-start; flex-direction: column; }
+      .footer { padding-left: 22px; padding-right: 22px; flex-direction: column; }
+    }
+
+    @media print {
+      @page { size: A4; margin: 7mm; }
+
+      html, body {
+        width: 210mm;
+        min-height: 297mm;
+        background: white;
+      }
+
+      body {
+        font-size: 7.3pt;
+        line-height: 1.3;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .page {
+        width: 196mm;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .hero { padding: 7mm 8mm 6mm; }
+      .hero-grid { grid-template-columns: 1.35fr 0.65fr; gap: 7mm; }
+      .hero h1 { margin-bottom: 2mm; font-size: 25pt; }
+      .hero p { font-size: 8.5pt; }
+      .hero-side { gap: 1.5mm; }
+      .button { padding: 2mm 3mm; font-size: 7pt; }
+
+      .content { padding: 5mm 8mm 4mm; }
+      .metrics { gap: 2mm; margin-bottom: 4mm; }
+      .metric { padding: 3mm; }
+      .metric strong { font-size: 15pt; }
+      .metric span { margin-top: 1mm; font-size: 6.5pt; }
+
+      .section { padding: 4mm 0; }
+      .section-label { margin-bottom: 1mm; font-size: 6pt; }
+      h2 { margin-bottom: 2mm; font-size: 13pt; }
+      h3 { margin-bottom: 1mm; font-size: 9pt; }
+      .grid-2 { gap: 5mm; }
+      .design { padding: 3mm; }
+      .design ul { gap: 1mm 3mm; margin-top: 2mm; font-size: 6.5pt; }
+
+      .flow { gap: 1.2mm; margin-top: 3mm; }
+      .flow-item { min-height: 12mm; padding: 2mm; font-size: 6pt; }
+      .flow-item span { margin-bottom: 1mm; font-size: 5.5pt; }
+
+      .case { grid-template-columns: 0.75fr 1.25fr; gap: 4mm; }
+      .case-summary { padding: 3mm; }
+      .case-summary p, .winner span { font-size: 6.5pt; }
+      .winner { padding-top: 2mm; }
+      .winner strong { font-size: 14pt; }
+
+      table { font-size: 6.4pt; }
+      th, td { padding: 1.6mm 2mm; }
+      th { font-size: 5.5pt; }
+
+      .before-after { grid-template-columns: 1fr 7mm 1fr; gap: 2mm; }
+      .workflow-box { padding: 2.5mm; }
+      .workflow-box ul { margin-top: 1mm; font-size: 6.2pt; }
+      .workflow-box li { margin: 0.5mm 0; }
+
+      .impact { grid-template-columns: 1.15fr 0.85fr; gap: 4mm; }
+      .formula { padding: 3mm; font-size: 6pt; }
+
+      .evidence { gap: 4mm; padding: 3mm; }
+      .evidence p { font-size: 6.3pt; }
+      .source-evidence { display: none; }
+      .disclosure { margin-top: 2mm; font-size: 5.7pt; }
+      .footer { padding: 2.5mm 8mm; font-size: 5.5pt; }
+    }
+  </style>
+</head>
+<body>
+  <article class="page">
+    <header class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Working AI solution on PAL</div>
+          <h1>ProcurePilot</h1>
+          <p>
+            A governed AI procurement agent that converts supplier quotations into an
+            evidence-linked recommendation, explicit human approval, and a non-binding Draft PO.
+          </p>
+        </div>
+        <div class="hero-side">
+          <a class="button" href="https://share.getmindpal.com/thread/agent/6a61ee636307c66adf9a546e" target="_blank" rel="noopener">
+            Open live PAL agent &amp; demo chat ↗
+          </a>
+          <button class="button secondary" type="button" onclick="window.print()">Save one-pager as PDF</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="metrics" aria-label="Key outcomes">
+        <div class="metric"><strong>93.20</strong><span>winning supplier score</span></div>
+        <div class="metric"><strong>$3,600</strong><span>scenario cost advantage</span></div>
+        <div class="metric"><strong>87%</strong><span>estimated cycle-time reduction</span></div>
+        <div class="metric"><strong>599%</strong><span>illustrative annual ROI</span></div>
+      </div>
+
+      <section class="section">
+        <div class="grid-2">
+          <div class="copy">
+            <div class="section-label">01 · High-value business problem</div>
+            <h2>Supplier selection is slow, inconsistent, and operationally risky</h2>
+            <p>
+              Industrial procurement teams compare price, delivery, quality, reliability, financial
+              risk, ESG, and commercial terms across emails and spreadsheets. Manual review is hard
+              to reproduce and can favor the lowest price even when a late supplier threatens
+              production. Solving this protects spend, continuity, compliance, and auditability.
+            </p>
+          </div>
+          <div class="design">
+            <div class="section-label">02 · Solution design</div>
+            <h3>One PAL agent, controlled evidence, human authority</h3>
+            <ul>
+              <li>Six governed KB sources</li>
+              <li>Missing-data clarification</li>
+              <li>Three supplier hard gates</li>
+              <li>Seven weighted criteria</li>
+              <li>Prompt-injection defense</li>
+              <li>Evidence-linked dossier</li>
+              <li>Exact <code>APPROVE</code> token</li>
+              <li>Non-binding Draft PO</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="flow" aria-label="Agent workflow">
+          <div class="flow-item"><span>STEP 1</span>Read and validate PR</div>
+          <div class="flow-item"><span>STEP 2</span>Retrieve policy and master data</div>
+          <div class="flow-item"><span>STEP 3</span>Collect missing quotes</div>
+          <div class="flow-item"><span>STEP 4</span>Apply hard gates</div>
+          <div class="flow-item"><span>STEP 5</span>Compare seven criteria</div>
+          <div class="flow-item"><span>STEP 6</span>Recommend with evidence</div>
+          <div class="flow-item"><span>STEP 7</span>Approve, then Draft PO</div>
+        </div>
+      </section>
+
+      <section class="section case">
+        <div class="case-summary">
+          <div class="section-label" style="color:#86dabc;">03 · Demonstrated case</div>
+          <h2>PR-2026-0042</h2>
+          <p>
+            1,000 industrial temperature sensors · Bac Ninh Plant · USD 50,000 budget ·
+            delivery required by 30 Aug 2026.
+          </p>
+          <div class="winner">
+            <strong>SUP-A · 93.20</strong>
+            <span>Recommended at USD 45,200, delivering three days early.</span>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Supplier</th><th>TCO</th><th>Delivery</th><th>Score</th><th>Decision</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>SUP-A · Alpha</strong></td><td>$45,200</td><td>3 days early</td><td><strong>93.20</strong></td><td class="recommended">Recommended</td></tr>
+              <tr><td>SUP-C · CoreSense</td><td>$48,800</td><td>12 days early</td><td>93.16</td><td>Close second</td></tr>
+              <tr><td>SUP-B · Beta</td><td>$41,500</td><td class="late">9 days late</td><td>76.30</td><td>Eligible, not recommended</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section before-after">
+        <div class="workflow-box">
+          <div class="section-label">04 · Before PAL</div>
+          <h3>Manual sourcing workflow</h3>
+          <ul>
+            <li>Search emails, files, and spreadsheets</li>
+            <li>Normalize quotes and formulas manually</li>
+            <li>Rely on buyer memory for policy checks</li>
+            <li>Use ambiguous approval language</li>
+            <li>Assemble rationale and PO draft by hand</li>
+          </ul>
+        </div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="workflow-box after">
+          <div class="section-label">After ProcurePilot</div>
+          <h3>Governed agent workflow</h3>
+          <ul>
+            <li>Retrieve controlled business evidence</li>
+            <li>Ask for missing values instead of guessing</li>
+            <li>Apply consistent hard gates and scoring</li>
+            <li>Require an exact human approval token</li>
+            <li>Generate dossier and non-binding Draft PO</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section impact">
+        <div>
+          <div class="section-label">05 · Impact and estimated ROI</div>
+          <h2>Faster analysis with visible sourcing value</h2>
+          <p>
+            The demonstrated recommendation has a <strong>USD 3,600 scenario cost advantage</strong>
+            versus the next-best on-time supplier and remains USD 4,800 under budget. A conservative
+            planning case of ten similar requests per month estimates analysis time falling from
+            2.5 hours to 20 minutes, producing USD 7,812 in annual labor capacity and USD 27,120 in
+            sourcing benefit.
+          </p>
+        </div>
+        <div class="formula">
+          Estimated annual benefit = $7,812 + $27,120 = $34,932<br>
+          Illustrative cost = $5,000/year<br>
+          ROI = ($34,932 − $5,000) / $5,000 = 599%<br>
+          Estimated payback ≈ 1.7 months
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="evidence">
+          <div>
+            <div class="section-label" style="color:var(--amber);">06 · Live evidence</div>
+            <h3 style="margin:0;">The published PAL chat is the evidence trail</h3>
+            <p>
+              It shows quote collection, missing-data control, prompt-injection detection,
+              supplier comparison, rejection of ambiguous approval, exact-token approval,
+              and creation of a Draft PO marked NOT SENT — NOT BINDING.
+            </p>
+          </div>
+          <a class="button" href="https://share.getmindpal.com/thread/agent/6a61ee636307c66adf9a546e" target="_blank" rel="noopener">
+            View live evidence ↗
+          </a>
+        </div>
+
+        <details class="source-evidence">
+          <summary>Repository evidence · Open source files used by the PAL agent</summary>
+          <div class="source-links">
+            <a class="source-link" href="pal_mvp_assets/01_procurement_policy.md" target="_blank">Procurement policy ↗</a>
+            <a class="source-link" href="pal_mvp_assets/02_supplier_master.csv" target="_blank">Supplier master ↗</a>
+            <a class="source-link" href="pal_mvp_assets/03_supplier_performance.csv" target="_blank">Supplier performance ↗</a>
+            <a class="source-link" href="pal_mvp_assets/04_scoring_model.md" target="_blank">Scoring model ↗</a>
+            <a class="source-link" href="pal_mvp_assets/05_demo_case_context.md" target="_blank">PR case context ↗</a>
+            <a class="source-link" href="pal_mvp_assets/06_draft_po_template.md" target="_blank">Draft PO template ↗</a>
+            <a class="source-link" href="pal_mvp_assets/quote_SUP-A.md" target="_blank">Quote SUP-A ↗</a>
+            <a class="source-link" href="pal_mvp_assets/quote_SUP-B.md" target="_blank">Quote SUP-B ↗</a>
+            <a class="source-link" href="pal_mvp_assets/quote_SUP-C.md" target="_blank">Quote SUP-C + injection test ↗</a>
+            <a class="source-link" href="pal_mvp_assets/procurepilot_calculator.py" target="_blank">Python calculator ↗</a>
+            <a class="source-link" href="ProcurePilot_One_Pager.md" target="_blank">One-pager source ↗</a>
+            <a class="source-link" href="ProcurePilot_Evidence_Appendix.md" target="_blank">Evidence appendix ↗</a>
+            <a class="source-link" href="deliverables/08_procurepilot_pal_mvp_blueprint.md" target="_blank">PAL MVP blueprint ↗</a>
+            <a class="source-link" href="deliverables/09_procurepilot_source_audit_bugfix.md" target="_blank">Source audit notes ↗</a>
+          </div>
+        </details>
+
+        <div class="disclosure">
+          <strong>MVP disclosure:</strong> The end-to-end governed PAL workflow was demonstrated.
+          The live session did not expose a Python execution tool, so the base-case scores were
+          manually reproduced and checked against the locked regression fixture. Production
+          readiness requires Code Interpreter or a deterministic scoring API with execution logs.
+          ROI values are estimates based on the assumptions stated above, not realized savings.
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>ProcurePilot · AI Procurement Decision Agent on PAL</span>
+      <span>PR-2026-0042 · Functional MVP · Human-approved Draft PO only</span>
+    </footer>
+  </article>
+</body>
+</html>

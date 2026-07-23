@@ -1,0 +1,5 @@
+supplier_id,on_time_delivery_pct,quality_score,response_score,esg_score
+SUP-A,96.5,93,90,78
+SUP-B,88.0,90,85,70
+SUP-C,98.0,98,92,85
+

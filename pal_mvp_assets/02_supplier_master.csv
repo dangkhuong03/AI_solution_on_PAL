@@ -1,0 +1,5 @@
+supplier_id,supplier_name,status,category,compliance_status,financial_risk,conflict_flag
+SUP-A,Alpha Industrial,APPROVED,MRO_SENSORS,PASS,LOW,false
+SUP-B,Beta Components,APPROVED,MRO_SENSORS,PASS,MEDIUM,false
+SUP-C,CoreSense Technologies,APPROVED,MRO_SENSORS,PASS,LOW,false
+
